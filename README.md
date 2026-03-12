@@ -53,8 +53,8 @@ Make sure you have the following installed on your system before running the pro
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/diagnostic-lab-simulator.git
-cd diagnostic-lab-simulator
+git clone https://github.com/your-username/Diagnostic-Lab-Simulator.git
+cd Diagnostic-Lab-Simulator
 ```
 
 ### 2. Run the Backend (ASP.NET Core API)
