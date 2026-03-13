@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy solution and project files first (layer caching)
-COPY DLSimulator.Back*.sln ./
+COPY DLSimulator.Backend.slnx ./
 COPY DLSimulator.API/DLSimulator.API.csproj ./DLSimulator.API/
 COPY DLSimulator.Core/DLSimulator.Core.csproj ./DLSimulator.Core/
 
