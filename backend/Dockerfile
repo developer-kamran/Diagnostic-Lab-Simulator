@@ -7,8 +7,8 @@ COPY backend/DLSimulator.Backend.slnx ./
 COPY backend/DLSimulator.API/DLSimulator.API.csproj ./DLSimulator.API/
 COPY backend/DLSimulator.Core/DLSimulator.Core.csproj ./DLSimulator.Core/
 
-# Restore dependencies
-RUN dotnet restore
+# Restore dependencies — point explicitly to the solution file
+RUN dotnet restore DLSimulator.Backend.slnx
 
 # Copy everything else and publish
 COPY backend/ .
