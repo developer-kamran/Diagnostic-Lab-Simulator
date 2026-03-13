@@ -3,15 +3,15 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy solution and project files first (layer caching)
-COPY DLSimulator.Backend.slnx ./
-COPY DLSimulator.API/DLSimulator.API.csproj ./DLSimulator.API/
-COPY DLSimulator.Core/DLSimulator.Core.csproj ./DLSimulator.Core/
+COPY backend/DLSimulator.Backend.slnx ./
+COPY backend/DLSimulator.API/DLSimulator.API.csproj ./DLSimulator.API/
+COPY backend/DLSimulator.Core/DLSimulator.Core.csproj ./DLSimulator.Core/
 
 # Restore dependencies
 RUN dotnet restore
 
 # Copy everything else and publish
-COPY . .
+COPY backend/ .
 RUN dotnet publish DLSimulator.API/DLSimulator.API.csproj -c Release -o /app/publish
 
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
