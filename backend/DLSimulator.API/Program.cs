@@ -33,7 +33,7 @@ builder.Services.AddCors(options =>
         policy
             .WithOrigins(
                 "http://localhost:3000",   // Next.js dev
-                "https://dlsimulator.vercel.app"  // Update with your production URL
+                "https://dlsimulator.vercel.app/"  // Update with your production URL
             )
             .AllowAnyHeader()
             .AllowAnyMethod();
