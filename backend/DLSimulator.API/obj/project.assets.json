@@ -514,19 +514,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\dell\\.nuget\\packages\\": {}
+    "C:\\Users\\PMLS\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.API\\DLSimulator.API.csproj",
+      "projectUniqueName": "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.API\\DLSimulator.API.csproj",
       "projectName": "DLSimulator.API",
-      "projectPath": "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.API\\DLSimulator.API.csproj",
-      "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.API\\obj\\",
+      "projectPath": "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.API\\DLSimulator.API.csproj",
+      "packagesPath": "C:\\Users\\PMLS\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\PMLS\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
@@ -538,8 +538,8 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.Core\\DLSimulator.Core.csproj": {
-              "projectPath": "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.Core\\DLSimulator.Core.csproj"
+            "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.Core\\DLSimulator.Core.csproj": {
+              "projectPath": "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.Core\\DLSimulator.Core.csproj"
             }
           }
         }
@@ -588,7 +588,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.104/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
