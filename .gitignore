@@ -1,3 +1,15 @@
 ~docs/Project Description.docx
 ~docs/Modeling Definitions.md
 ~docs/flowchart.png
+
+# .NET build artifacts
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+
+# Visual Studio / IDE
+.vs/
+.vscode/
+*.user
+*.suo

@@ -2,7 +2,7 @@
   "version": 3,
   "targets": {
     "net10.0": {
-      "Microsoft.AspNetCore.OpenApi/10.0.4": {
+      "Microsoft.AspNetCore.OpenApi/10.0.5": {
         "type": "package",
         "dependencies": {
           "Microsoft.OpenApi": "2.0.0"
@@ -127,10 +127,10 @@
     }
   },
   "libraries": {
-    "Microsoft.AspNetCore.OpenApi/10.0.4": {
-      "sha512": "OsEhbmT4Xenukau5YCR867gr/HmuAJ9DqMBPQGTcmdNU/TqBqdcnB+yLNwD/mTdkHzLBB+XG7cI4H1L5B1jx+Q==",
+    "Microsoft.AspNetCore.OpenApi/10.0.5": {
+      "sha512": "vTcxIfOPyfFbYk1g8YcXJfkMnlEWVkSnnjxcZLy60zgwiHMRf2SnZR+9E4HlpwKxgE3yfKMOti8J6WfKuKsw6w==",
       "type": "package",
-      "path": "microsoft.aspnetcore.openapi/10.0.4",
+      "path": "microsoft.aspnetcore.openapi/10.0.5",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -141,7 +141,7 @@
         "build/Microsoft.AspNetCore.OpenApi.targets",
         "lib/net10.0/Microsoft.AspNetCore.OpenApi.dll",
         "lib/net10.0/Microsoft.AspNetCore.OpenApi.xml",
-        "microsoft.aspnetcore.openapi.10.0.4.nupkg.sha512",
+        "microsoft.aspnetcore.openapi.10.0.5.nupkg.sha512",
         "microsoft.aspnetcore.openapi.nuspec"
       ]
     },
@@ -509,24 +509,24 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "DLSimulator.Core >= 1.0.0",
-      "Microsoft.AspNetCore.OpenApi >= 10.0.4",
+      "Microsoft.AspNetCore.OpenApi >= 10.0.5",
       "Swashbuckle.AspNetCore >= 10.1.5"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\PMLS\\.nuget\\packages\\": {}
+    "C:\\Users\\dell\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.API\\DLSimulator.API.csproj",
+      "projectUniqueName": "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.API\\DLSimulator.API.csproj",
       "projectName": "DLSimulator.API",
-      "projectPath": "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.API\\DLSimulator.API.csproj",
-      "packagesPath": "C:\\Users\\PMLS\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.API\\obj\\",
+      "projectPath": "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.API\\DLSimulator.API.csproj",
+      "packagesPath": "C:\\Users\\dell\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\PMLS\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\dell\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
@@ -538,8 +538,8 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "projectReferences": {
-            "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.Core\\DLSimulator.Core.csproj": {
-              "projectPath": "C:\\Users\\PMLS\\OneDrive\\Desktop\\Simulator\\forkRepo\\Diagnostic-Lab-Simulator\\backend\\DLSimulator.Core\\DLSimulator.Core.csproj"
+            "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.Core\\DLSimulator.Core.csproj": {
+              "projectPath": "C:\\Users\\dell\\Documents\\University\\7th-semester\\Modeling and Simulation (TOCI-II)\\DLSimulator\\backend\\DLSimulator.Core\\DLSimulator.Core.csproj"
             }
           }
         }
@@ -562,7 +562,7 @@
         "dependencies": {
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
-            "version": "[10.0.4, )"
+            "version": "[10.0.5, )"
           },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
@@ -588,7 +588,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.107/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.AspNetCore": "(,10.0.32767]",
           "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",

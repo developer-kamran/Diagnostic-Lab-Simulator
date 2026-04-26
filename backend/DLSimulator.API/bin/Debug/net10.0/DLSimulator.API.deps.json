@@ -9,21 +9,21 @@
       "DLSimulator.API/1.0.0": {
         "dependencies": {
           "DLSimulator.Core": "1.0.0",
-          "Microsoft.AspNetCore.OpenApi": "10.0.4",
+          "Microsoft.AspNetCore.OpenApi": "10.0.5",
           "Swashbuckle.AspNetCore": "10.1.5"
         },
         "runtime": {
           "DLSimulator.API.dll": {}
         }
       },
-      "Microsoft.AspNetCore.OpenApi/10.0.4": {
+      "Microsoft.AspNetCore.OpenApi/10.0.5": {
         "dependencies": {
           "Microsoft.OpenApi": "2.4.1"
         },
         "runtime": {
           "lib/net10.0/Microsoft.AspNetCore.OpenApi.dll": {
-            "assemblyVersion": "10.0.4.0",
-            "fileVersion": "10.0.426.12010"
+            "assemblyVersion": "10.0.5.0",
+            "fileVersion": "10.0.526.15411"
           }
         }
       },
@@ -88,12 +88,12 @@
       "serviceable": false,
       "sha512": ""
     },
-    "Microsoft.AspNetCore.OpenApi/10.0.4": {
+    "Microsoft.AspNetCore.OpenApi/10.0.5": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-OsEhbmT4Xenukau5YCR867gr/HmuAJ9DqMBPQGTcmdNU/TqBqdcnB+yLNwD/mTdkHzLBB+XG7cI4H1L5B1jx+Q==",
-      "path": "microsoft.aspnetcore.openapi/10.0.4",
-      "hashPath": "microsoft.aspnetcore.openapi.10.0.4.nupkg.sha512"
+      "sha512": "sha512-vTcxIfOPyfFbYk1g8YcXJfkMnlEWVkSnnjxcZLy60zgwiHMRf2SnZR+9E4HlpwKxgE3yfKMOti8J6WfKuKsw6w==",
+      "path": "microsoft.aspnetcore.openapi/10.0.5",
+      "hashPath": "microsoft.aspnetcore.openapi.10.0.5.nupkg.sha512"
     },
     "Microsoft.OpenApi/2.4.1": {
       "type": "package",
