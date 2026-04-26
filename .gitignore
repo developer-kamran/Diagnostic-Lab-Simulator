@@ -1,15 +1,13 @@
-~docs/Project Description.docx
-~docs/Modeling Definitions.md
-~docs/flowchart.png
-
 # .NET build artifacts
 **/bin/
 **/obj/
 **/Debug/
 **/Release/
 
-# Visual Studio / IDE
+# Node modules
+**/node_modules/
+
+# Visual Studio
 .vs/
-.vscode/
-*.user
 *.suo
+*.user
