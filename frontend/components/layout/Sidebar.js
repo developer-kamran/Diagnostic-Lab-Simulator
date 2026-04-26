@@ -25,58 +25,58 @@ export default function Sidebar() {
     <>
       {/* Mobile toggle button */}
       <button
-        className='mobile-toggle'
+        className="mobile-toggle"
         onClick={() => setMobileOpen((o) => !o)}
-        aria-label='Toggle sidebar'
+        aria-label="Toggle sidebar"
       >
         ☰
       </button>
 
       <div
-        className={`sidebar${mobileOpen ? ' mobile-open' : ''}`}
-        id='sidebar'
+        className={`sidebar${mobileOpen ? " mobile-open" : ""}`}
+        id="sidebar"
       >
         {/* Header */}
-        <div className='sidebar-header'>
+        <div className="sidebar-header">
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
-            <div className='sidebar-title' style={{ margin: 0 }}>
+            <div className="sidebar-title" style={{ margin: 0 }}>
               ⚗️
-              <Link href='/'>DL Sim</Link>
+              <Link href="/">DL Sim</Link>
             </div>
             {/* Close button — visible on mobile only via CSS */}
             <button
               onClick={() => setMobileOpen(false)}
-              aria-label='Close sidebar'
-              className='sidebar-close-btn'
+              aria-label="Close sidebar"
+              className="sidebar-close-btn"
             >
               ✕
             </button>
           </div>
-          <div className='sidebar-subtitle' style={{ marginTop: '0.4rem' }}>
+          <div className="sidebar-subtitle" style={{ marginTop: "0.4rem" }}>
             Lab Diagnostic
           </div>
         </div>
 
         {/* Queueing Models */}
-        <div className='menu-section'>
-          <div className='menu-label'>Analysis</div>
+        <div className="menu-section">
+          <div className="menu-label">Analysis</div>
 
           <button
-            className='menu-button'
-            type='button'
-            aria-expanded={queueOpen ? 'true' : 'false'}
+            className="menu-button"
+            type="button"
+            aria-expanded={queueOpen ? "true" : "false"}
             onClick={() => setQueueOpen((o) => !o)}
           >
             📊 Queueing Models
           </button>
 
-          <div className={`submenu${queueOpen ? ' show' : ''}`}>
+          <div className={`submenu${queueOpen ? " show" : ""}`}>
             {models.map(({ key, label }) => {
               const href = `/queue/${key}`;
               const active = pathname === href;
@@ -84,7 +84,7 @@ export default function Sidebar() {
                 <Link
                   key={key}
                   href={href}
-                  className={`submenu-link${active ? ' active' : ''}`}
+                  className={`submenu-link${active ? " active" : ""}`}
                   onClick={() => setMobileOpen(false)}
                 >
                   {label}
@@ -95,15 +95,16 @@ export default function Sidebar() {
         </div>
 
         {/* Simulator */}
-        <div className='menu-section'>
-          <div className='menu-label'>Tools</div>
-          <button
-            className='menu-button'
-            type='button'
-            onClick={() => alert('3D Simulator coming soon!')}
+        <div className="menu-section">
+          <div className="menu-label">Tools</div>
+          <Link
+            href="/simulation"
+            className="menu-button"
+            type="button"
+            style={{ display: "block", textDecoration: "none" }}
           >
             🧪 Simulator
-          </button>
+          </Link>
         </div>
       </div>
     </>
