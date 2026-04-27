@@ -4,17 +4,20 @@ A discrete-event **queueing model simulator** built for the Dr. Essa Diagnostic 
 
 ## 📸 Overview
 
-The system allows users to configure queueing parameters and instantly compute performance metrics such as average waiting time, queue length, server utilization, idle time, and lab throughput — for three queueing models with multi-server support.
+The system allows users to configure queueing parameters and instantly compute key performance metrics such as average waiting time, queue length, server utilization, idle time, and lab throughput — for **five queueing models** with full multi-server support.
 
 ---
 
 ## 🧮 Supported Models
 
-| Model     | Arrival     | Service     | Multi-Server                |
-| --------- | ----------- | ----------- | --------------------------- |
-| **M/M/1** | Exponential | Exponential | ✅ Exact (Erlang-C)         |
-| **M/G/1** | Exponential | General     | ✅ Cosmetatos Approximation |
-| **G/G/1** | General     | General     | ✅ Extended Kingman (Whitt) |
+| Model     | Arrival     | Service     | Multi-Server Support                      |
+| --------- | ----------- | ----------- | ----------------------------------------- |
+| **M/M/s** | Exponential | Exponential | ✅ Exact (Erlang-C)                       |
+| **M/G/s** | Exponential | General     | ✅ Cosmetatos Approximation               |
+| **G/G/s** | General     | General     | ✅ Extended Kingman Approximation (Whitt) |
+| **M/M/1** | Exponential | Exponential | (Single-server case of M/M/s)             |
+| **M/G/1** | Exponential | General     | (Single-server case of M/G/s)             |
+| **G/G/1** | General     | General     | (Single-server case of G/G/s)             |
 
 ### Supported General Distributions (G)
 
@@ -28,13 +31,14 @@ The system allows users to configure queueing parameters and instantly compute p
 
 - **λ** — Arrival rate (patients/min)
 - **μ** — Service rate (patients/min)
-- **ρ** — Server utilization
-- **Idle Time** — (fraction of time server is idle)
+- **ρ** — Server utilization (per server)
+- **Idle Time** — Fraction of time servers are idle
 - **Lq** — Average number of patients waiting in queue
 - **L** — Average number of patients in the system
 - **Wq** — Average waiting time in queue (minutes)
 - **W** — Average total time in system (minutes)
 - **Throughput** — Expected patients served in 120 minutes
+- **Stability Status** — Whether the system is stable (ρ < 1)
 
 ---
 
@@ -42,7 +46,7 @@ The system allows users to configure queueing parameters and instantly compute p
 
 Make sure you have the following installed on your system before running the project:
 
-- **[.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)** — required to build and run the backend API. You can verify your installation by running `dotnet --version` in your terminal.
+- **[.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)** — required to build and run the backend API. Verify with `dotnet --version`.
 - **[Node.js](https://nodejs.org/)** (v18 or higher) — required for the Next.js frontend
 - **npm** (comes with Node.js)
 
@@ -53,7 +57,7 @@ Make sure you have the following installed on your system before running the pro
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/Diagnostic-Lab-Simulator.git
+git clone https://github.com/developer-kamran/Diagnostic-Lab-Simulator.git
 cd Diagnostic-Lab-Simulator
 ```
 
@@ -85,25 +89,25 @@ The frontend will start at `http://localhost:3000`.
 
 ### `POST /api/queue/calculate`
 
-**Request Body Example (M/M/1):**
+**Request Body Example (M/M/s — Multi-server):**
 
 ```json
 {
-  "modelType": 0, // 0 = MM1, 1 = MG1, 2 = GG1
+  "modelType": 0, // 0 = M/M/s, 1 = M/G/s, 2 = G/G/s
   "arrivalDistribution": 0, // 0 = Exponential
   "arrivalMean": 5,
   "serviceDistribution": 0, // 0 = Exponential
   "serviceMean": 3,
-  "numberOfServers": 1,
+  "numberOfServers": 3,
   "simulationDuration": 120
 }
 ```
 
-**Request Body Example (G/G/1 with Uniform):**
+**Request Body Example (G/G/s with Uniform distributions):**
 
 ```json
 {
-  "modelType": 0, // 0 = MM1, 1 = MG1, 2 = GG1
+  "modelType": 2, // 0 = M/M/s, 1 = M/G/s, 2 = G/G/s
   "arrivalDistribution": 1, // 1 = Uniform, 2 = Normal, 3 = Gamma
   "arrivalMin": 2,
   "arrivalMax": 8,
@@ -119,7 +123,7 @@ The frontend will start at `http://localhost:3000`.
 
 ```json
 {
-  "modelType": 0, // 0 = MM1, 1 = MG1, 2 = GG1
+  "modelType": 0, // 0 = M/M/s, 1 = M/G/s, 2 = G/G/s
   "numberOfServers": 1,
   "lambda": 0.2,
   "mu": 0.3333,
