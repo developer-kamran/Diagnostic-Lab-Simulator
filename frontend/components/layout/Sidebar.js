@@ -96,12 +96,13 @@ export default function Sidebar() {
 
         {/* Simulator */}
         <div className='menu-section'>
-          <div className='menu-label'>Tools</div>
+          <div className='menu-label'>Simulation</div>
           <Link
             href='/simulator'
-            className='menu-button'
-            type='button'
+            /* Update the line below to add the active class */
+            className={`menu-button ${pathname === '/simulator' ? 'active' : ''}`}
             style={{ display: 'block', textDecoration: 'none' }}
+            onClick={() => setMobileOpen(false)}
           >
             🧪 Simulator
           </Link>
