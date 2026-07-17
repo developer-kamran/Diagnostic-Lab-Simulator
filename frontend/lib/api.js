@@ -9,8 +9,6 @@ export async function calculateQueue(payload) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    console.log(err);
-
     throw new Error(err.detail || `Request failed with status ${res.status}`);
   }
 
@@ -28,7 +26,6 @@ export async function runSimulation(payload) {
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    console.log(error);
     throw new Error(err.detail || `Request failed with status ${res.status}`);
   }
 
