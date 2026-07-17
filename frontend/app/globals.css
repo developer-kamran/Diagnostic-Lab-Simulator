@@ -1136,3 +1136,676 @@ body {
     padding-top: 3rem;
   }
 }
+
+/* ─────────────────────────────────────────────
+   SIMULATOR RESULTS PAGE
+   Paste these classes into your globals.css
+───────────────────────────────────────────── */
+
+/* ── Page wrapper ──────────────────────────── */
+.sim-results-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* ── Section card ──────────────────────────── */
+.sim-section {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.sim-section-title {
+  color: var(--text-primary);
+  font-family: 'Space Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* ── Simulation table ──────────────────────── */
+.sim-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sim-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+}
+
+/* Header cells */
+.sim-th {
+  padding: 10px 8px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--bg-tertiary);
+  border-bottom: 2px solid var(--border-color);
+}
+
+/* Highlighted headers */
+.sim-th-arrival {
+  background: #1a2f4a !important;
+  color: #60a5fa !important;
+}
+
+.sim-th-service {
+  background: #1a3328 !important;
+  color: #34d399 !important;
+}
+
+/* Row stripes */
+.sim-tr-even {
+  background: var(--bg-secondary);
+}
+.sim-tr-odd {
+  background: var(--bg-tertiary);
+}
+
+/* Body cells */
+.sim-td {
+  padding: 8px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.73rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.sim-td-no {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Highlighted cells */
+.sim-td-arrival {
+  background: #1a2f4a33;
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.sim-td-service {
+  background: #1a332833;
+  color: #34d399;
+  font-weight: 600;
+}
+
+.sim-td-server {
+  font-weight: 700;
+}
+
+/* ── Gantt chart ───────────────────────────── */
+.sim-gantt-wrap {
+  background: #0a0f1a;
+  border-radius: 8px;
+  padding: 0.75rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sim-gantt-canvas {
+  display: block;
+  max-width: 100%;
+}
+
+.sim-gantt-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.sim-gantt-legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  padding-left: 60px;
+}
+
+.sim-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sim-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.sim-legend-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-family: 'Space Mono', monospace;
+}
+
+/* ── Performance cards ─────────────────────── */
+.sim-perf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.sim-perf-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  transition: border-color 0.2s ease;
+}
+
+.sim-perf-card:hover {
+  border-color: var(--accent);
+}
+
+.sim-perf-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.sim-perf-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-family: 'Space Mono', monospace;
+}
+
+.sim-perf-icon {
+  font-size: 1rem;
+}
+
+.sim-perf-value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  margin-top: 0.25rem;
+}
+
+/* ── Per-server utilization ────────────────── */
+.sim-server-util {
+  margin-top: 1.5rem;
+}
+
+.sim-server-util-title {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 0.75rem;
+}
+
+.sim-server-util-grid {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.sim-server-util-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  min-width: 120px;
+}
+
+.sim-server-util-label {
+  font-size: 0.72rem;
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 0.3rem;
+}
+
+.sim-server-util-value {
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ── Mobile responsive ─────────────────────── */
+@media (max-width: 768px) {
+  .sim-results-page {
+    padding: 1rem;
+  }
+
+  .sim-section {
+    padding: 1rem;
+  }
+
+  .sim-perf-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sim-perf-value {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sim-perf-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .sim-perf-card {
+    padding: 0.75rem;
+  }
+
+  .sim-perf-value {
+    font-size: 1rem;
+  }
+
+  .sim-server-util-grid {
+    gap: 0.5rem;
+  }
+
+  .sim-server-util-card {
+    min-width: 100px;
+    padding: 0.6rem 1rem;
+  }
+
+  .sim-gantt-legend {
+    padding-left: 0;
+  }
+}
+/* ─────────────────────────────────────────────
+   SIMULATOR RESULTS PAGE — v2
+   Drop-in replacement for the "SIMULATOR RESULTS PAGE" block
+   at the bottom of your globals.css. Same class names as before
+   (no JSX changes needed) — just swap the block out.
+
+   Uses var(--x, fallback) everywhere so it renders correctly even
+   if you don't merge the two new :root variables below. For best
+   results, add these two lines inside your existing :root { }:
+
+     --bg-secondary: #141a24;
+     --bg-tertiary: #1c2330;
+───────────────────────────────────────────── */
+
+/* ── Page wrapper ──────────────────────────── */
+.sim-results-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* ── Header ─────────────────────────────────── */
+.results-header {
+  margin-bottom: 1.75rem;
+}
+
+.results-title {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(
+    135deg,
+    var(--secondary, #00d4ff) 0%,
+    var(--primary, #0066cc) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+  margin-bottom: 0.4rem;
+}
+
+.results-subtitle {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text-secondary, #b0b5c0);
+  letter-spacing: 0.02em;
+}
+
+/* ── Section card ──────────────────────────── */
+.sim-section {
+  background: var(--bg-secondary, #141a24);
+  border: 1px solid var(--border-color, #2a3040);
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset;
+}
+
+.sim-section-title {
+  color: var(--text-primary, #ffffff);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color, #2a3040);
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+/* ── Simulation table ──────────────────────── */
+.sim-table-wrap {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 520px;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border-color, #2a3040);
+  border-radius: 10px;
+}
+
+.sim-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 760px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+}
+
+/* Header cells — sticky so long tables stay readable */
+.sim-th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 11px 8px;
+  text-align: center;
+  color: var(--text-secondary, #b0b5c0);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  background: var(--bg-tertiary, #1c2330);
+  border-bottom: 2px solid var(--border-color, #2a3040);
+}
+
+/* Highlighted headers */
+.sim-th-arrival {
+  background: #142845 !important;
+  color: #60a5fa !important;
+}
+
+.sim-th-service {
+  background: #133226 !important;
+  color: #34d399 !important;
+}
+
+/* Row stripes */
+.sim-tr-even {
+  background: var(--bg-secondary, #141a24);
+}
+.sim-tr-odd {
+  background: var(--bg-tertiary, #1c2330);
+}
+.sim-table tbody tr {
+  transition: background 0.15s ease;
+}
+.sim-table tbody tr:hover {
+  background: rgba(0, 212, 255, 0.06);
+}
+
+/* Body cells */
+.sim-td {
+  padding: 7px 8px;
+  text-align: center;
+  color: var(--text-secondary, #b0b5c0);
+  font-size: 0.73rem;
+  border-bottom: 1px solid var(--border-color, #2a3040);
+  white-space: nowrap;
+}
+
+.sim-td-no {
+  color: var(--text-primary, #ffffff);
+  font-weight: 700;
+}
+
+/* Highlighted cells */
+.sim-td-arrival {
+  background: rgba(20, 40, 69, 0.4);
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.sim-td-service {
+  background: rgba(19, 50, 38, 0.4);
+  color: #34d399;
+  font-weight: 600;
+}
+
+.sim-td-server {
+  font-weight: 700;
+}
+
+/* ── Gantt chart — instrument-panel framing ─── */
+.sim-gantt-wrap {
+  background: #060a12;
+  border: 1px solid var(--border-color, #2a3040);
+  border-radius: 10px;
+  padding: 1rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+
+.sim-gantt-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(0, 212, 255, 0.05), transparent 40%);
+  pointer-events: none;
+}
+
+.sim-gantt-canvas {
+  display: block;
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+.sim-gantt-subtitle {
+  font-size: 0.78rem;
+  color: var(--text-secondary, #b0b5c0);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.sim-gantt-legend {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.85rem;
+  padding-left: 60px;
+}
+
+.sim-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sim-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px currentColor;
+}
+
+.sim-legend-label {
+  font-size: 0.72rem;
+  color: var(--text-secondary, #b0b5c0);
+  font-family: 'Space Mono', monospace;
+}
+
+/* ── Performance cards ─────────────────────── */
+.sim-perf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.sim-perf-card {
+  background: var(--bg-tertiary, #1c2330);
+  border: 1px solid var(--border-color, #2a3040);
+  border-left: 3px solid var(--card-color, var(--secondary, #00d4ff));
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.sim-perf-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-color, #2a3040);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.sim-perf-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.sim-perf-label {
+  font-size: 0.68rem;
+  color: var(--text-secondary, #b0b5c0);
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.sim-perf-icon {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.sim-perf-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: 'Space Mono', monospace;
+  margin-top: 0.25rem;
+  letter-spacing: -0.02em;
+}
+
+/* ── Server utilization ────────────────────── */
+.sim-server-util {
+  margin-top: 1.5rem;
+}
+
+.sim-server-util-title {
+  color: var(--text-secondary, #b0b5c0);
+  font-size: 0.72rem;
+  font-family: 'Space Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.sim-server-util-grid {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.sim-server-util-card {
+  background: var(--bg-secondary, #141a24);
+  border: 1px solid var(--border-color, #2a3040);
+  border-radius: 8px;
+  padding: 0.85rem 1.25rem;
+  min-width: 130px;
+}
+
+.sim-server-util-label {
+  font-size: 0.7rem;
+  font-family: 'Space Mono', monospace;
+  margin-bottom: 0.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.sim-server-util-value {
+  color: var(--text-primary, #ffffff);
+  font-weight: 700;
+  font-size: 1.15rem;
+  font-family: 'Space Mono', monospace;
+}
+
+/* ── Action buttons ─────────────────────────── */
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+/* ── Mobile responsive ─────────────────────── */
+@media (max-width: 768px) {
+  .sim-results-page {
+    padding: 1rem;
+  }
+
+  .results-title {
+    font-size: 1.6rem;
+  }
+
+  .sim-section {
+    padding: 1rem;
+  }
+
+  .sim-table-wrap {
+    max-height: 420px;
+  }
+
+  .sim-perf-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .sim-perf-value {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sim-perf-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .sim-perf-card {
+    padding: 0.75rem;
+  }
+
+  .sim-perf-value {
+    font-size: 1rem;
+  }
+
+  .sim-server-util-grid {
+    gap: 0.5rem;
+  }
+
+  .sim-server-util-card {
+    min-width: 100px;
+    padding: 0.6rem 1rem;
+  }
+
+  .sim-gantt-legend {
+    padding-left: 0;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+}

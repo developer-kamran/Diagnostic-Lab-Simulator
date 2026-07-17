@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:5000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export async function calculateQueue(payload) {
   const res = await fetch(`${API_BASE}/api/queue/calculate`, {
@@ -31,5 +31,3 @@ export async function runSimulation(payload) {
 
   return res.json();
 }
-
-// process.env.NEXT_PUBLIC_API_URL ||

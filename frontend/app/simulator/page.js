@@ -1,910 +1,282 @@
 'use client';
+
 import { useState } from 'react';
-import { runSimulation } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 
-export default function Simulator() {
-  const [form, setForm] = useState({
-    model: 'M/M/1',
-    arrival: '',
-    service: '', // μ - only used for M/M/1
-    customers: '',
-    distribution: 'Uniform', // 'Uniform' or 'Normal' - only used for M/G/1
-    serviceMin: '', // 'a' parameter for M/G/1 Uniform
-    serviceMax: '', // 'b' parameter for M/G/1 Uniform
-    serviceMean: '', // 'μ' parameter for M/G/1 Normal
-    serviceVariance: '', // 'σ²' parameter for M/G/1 Normal
-  });
-  const [data, setData] = useState([]);
-  const [poissonData, setPoissonData] = useState([]);
-  const [error, setError] = useState('');
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
-  // Mathematical helper for Poisson
-  const factorial = (n) => (n <= 1 ? 1 : n * factorial(n - 1));
-  const calculatePoisson = (k, lambda) =>
-    (Math.exp(-lambda) * Math.pow(lambda, k)) / factorial(k);
+const MODELS = [
+  { value: 'MM1', label: 'M/M/1' },
+  { value: 'MG1', label: 'M/G/1 ' },
+];
 
-  const runSim = async () => {
-    setError('');
+export default function SimulatorPage() {
+  const router = useRouter();
 
-    // Basic validation
-    if (!form.arrival || !form.customers) {
-      alert('Please fill in arrival rate and number of customers');
-      return;
-    }
+  const [model, setModel] = useState('MM1');
+  const [interArrival, setInterArrival] = useState('');
+  const [serviceTime, setServiceTime] = useState('');
+  const [serviceDist, setServiceDist] = useState('Uniform');
+  const [uniMin, setUniMin] = useState('');
+  const [uniMax, setUniMax] = useState('');
+  const [normalMean, setNormalMean] = useState('');
+  const [normalVariance, setNormalVariance] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    // Model-specific validation
-    if (form.model === 'M/M/1') {
-      if (!form.service) {
-        alert('Please enter service rate (μ) for M/M/1 model');
-        return;
-      }
-      if (parseFloat(form.service) <= 0) {
-        alert('Service rate (μ) must be greater than 0');
-        return;
-      }
-    } else if (form.model === 'M/G/1') {
-      if (form.distribution === 'Uniform') {
-        if (!form.serviceMin || !form.serviceMax) {
-          alert(
-            'Please enter both minimum (a) and maximum (b) service times for M/G/1',
-          );
-          return;
-        }
-        const min = parseFloat(form.serviceMin);
-        const max = parseFloat(form.serviceMax);
-        if (min >= max) {
-          alert(
-            'Minimum service time (a) must be less than maximum service time (b)',
-          );
-          return;
-        }
-        if (min < 0) {
-          alert('Minimum service time cannot be negative');
-          return;
-        }
-      } else if (form.distribution === 'Normal') {
-        if (!form.serviceMean || !form.serviceVariance) {
-          alert(
-            'Please enter both mean (μ) and variance (σ²) for the Normal distribution',
-          );
-          return;
-        }
-        const mean = parseFloat(form.serviceMean);
-        const variance = parseFloat(form.serviceVariance);
-        if (mean <= 0) {
-          alert('Service mean (μ) must be greater than 0');
-          return;
-        }
-        if (variance <= 0) {
-          alert('Service variance (σ²) must be greater than 0');
-          return;
-        }
-      }
-    }
+  const isG = model === 'MG1';
 
-    // Generate Poisson CDF Lookup Table Data
-    const lambda = parseFloat(form.arrival);
-    const lookup = [];
-    let cumulative = 0;
-    for (let k = 0; k <= 12; k++) {
-      const p = calculatePoisson(k, lambda);
-      const lookupValue = cumulative;
-      cumulative += p;
-      lookup.push({
-        k,
-        px: p.toFixed(5),
-        cum: cumulative.toFixed(5),
-        lookup: lookupValue.toFixed(5),
-      });
-    }
-    setPoissonData(lookup);
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
     try {
-      const result = await runSimulation(form);
-      setData(result);
+      // SimulatorController's SimulationRequest fields are all typed as
+      // `string` and parsed server-side with double.TryParse, so every
+      // value below is sent as a raw string (NOT a JS number) — sending
+      // a JSON number for a `string` property would fail to deserialize.
+      const payload = {
+        model: isG ? 'M/G/1' : 'M/M/1', // must match req.Model checks exactly
+        arrival: interArrival,
+        service: isG ? '' : serviceTime,
+        distribution: isG ? serviceDist : '',
+        serviceMin: isG && serviceDist === 'Uniform' ? uniMin : '',
+        serviceMax: isG && serviceDist === 'Uniform' ? uniMax : '',
+        serviceMean: isG && serviceDist === 'Normal' ? normalMean : '',
+        serviceVariance: isG && serviceDist === 'Normal' ? normalVariance : '',
+        // No customer count is sent — SimulatorController derives the
+        // number of trace-table rows itself from the Poisson lookup table.
+      };
+
+      // SimulatorController has [Route("api/[controller]")] on
+      // "SimulatorController", so the route is /api/Simulator/run.
+      const res = await fetch(`${API_BASE}/api/Simulator/run`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || 'Simulation failed');
+      }
+
+      // The backend currently returns a bare array of trace-table rows
+      // (SNo, CumulativeProb, NoOfMinK, ArrivalTime, ServiceTime, ...),
+      // not an object with { rows, performance, numberOfServers, ... }.
+      // The results page still expects the richer shape and will need to
+      // be updated separately to consume this.
+      const result = await res.json();
+      sessionStorage.setItem('simulationResult', JSON.stringify(result));
+      sessionStorage.setItem('simulationRequest', JSON.stringify(payload));
+      router.push('/simulator/results');
     } catch (err) {
-      setError(
-        err.message || 'Something went wrong. Please check your inputs.',
-      );
+      setError(err.message || 'Something went wrong.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const totalSimTime = data.length > 0 ? data[data.length - 1].endTime : 0;
-  const avgInterarrival =
-    data.length > 0
-      ? (
-          data.reduce((acc, curr) => acc + curr.interArrival, 0) /
-          (data.length - 1 || 1)
-        ).toFixed(4)
-      : 0;
-  const avgService =
-    data.length > 0
-      ? (
-          data.reduce((acc, curr) => acc + curr.serviceTime, 0) / data.length
-        ).toFixed(4)
-      : 0;
-  const avgWait =
-    data.length > 0
-      ? (
-          data.reduce((acc, curr) => acc + curr.waitTime, 0) / data.length
-        ).toFixed(4)
-      : 0;
-  const avgTurnaround =
-    data.length > 0
-      ? (
-          data.reduce((acc, curr) => acc + curr.turnaround, 0) / data.length
-        ).toFixed(4)
-      : 0;
-  const utilization =
-    data.length > 0 && totalSimTime > 0
-      ? (
-          (data.reduce((acc, curr) => acc + curr.serviceTime, 0) /
-            totalSimTime) *
-          100
-        ).toFixed(2)
-      : 0;
-  const Lq =
-    data.length > 0 && totalSimTime > 0
-      ? (
-          data.reduce((acc, curr) => acc + curr.waitTime, 0) / totalSimTime
-        ).toFixed(4)
-      : 0;
-  const L =
-    data.length > 0 && totalSimTime > 0
-      ? (
-          data.reduce((acc, curr) => acc + curr.turnaround, 0) / totalSimTime
-        ).toFixed(4)
-      : 0;
-
-  const PerformanceCard = ({ title, value, subtext, color, icon }) => (
-    <div
-      style={{
-        backgroundColor: 'rgba(15, 23, 42, 0.5)',
-        borderRadius: '24px',
-        padding: '25px',
-        border: `1px solid ${color}33`,
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-start',
-          marginBottom: '10px',
-        }}
-      >
-        <span
-          style={{ fontSize: '14px', fontWeight: 'bold', color: '#94a3b8' }}
-        >
-          {title}
-        </span>
-        <span style={{ fontSize: '20px', color: color }}>{icon}</span>
-      </div>
-      <div
-        style={{
-          fontSize: '32px',
-          fontWeight: 'bold',
-          color: color,
-          marginBottom: '5px',
-        }}
-      >
-        {value}
-      </div>
-      <div style={{ fontSize: '11px', color: '#64748b' }}>{subtext}</div>
-    </div>
-  );
+  const handleReset = () => {
+    setModel('MM1');
+    setInterArrival('');
+    setServiceTime('');
+    setServiceDist('Uniform');
+    setUniMin('');
+    setUniMax('');
+    setNormalMean('');
+    setNormalVariance('');
+    setError(null);
+  };
 
   return (
-    <div
-      style={{
-        backgroundColor: '#020617',
-        minHeight: '100vh',
-        padding: '40px',
-        color: '#cbd5e1',
-        fontFamily: 'sans-serif',
-      }}
-    >
-      {/* 1. INPUT FORM */}
-      <div
-        style={{
-          backgroundColor: '#0b1120',
-          borderRadius: '24px',
-          padding: '40px',
-          border: '1px solid #1e293b',
-          maxWidth: '850px',
-          margin: '0 auto 40px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-        }}
-      >
-        <h1
-          style={{
-            color: 'white',
-            fontSize: '28px',
-            marginBottom: '30px',
-            fontWeight: 'bold',
-          }}
-        >
-          🧪 Simulation Setup
-        </h1>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '25px',
-          }}
-        >
-          <div>
-            <label
-              style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}
-            >
-              QUEUEING MODEL
-            </label>
+    <div className='form-container'>
+      <div className='form-header'>
+        <h1 className='form-title'>🧪 Simulator</h1>
+        <p className='form-subtitle'>
+          Configure your queueing model parameters to run a discrete-event
+          simulation
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        {/* ── MODEL ── */}
+        <div className='form-section'>
+          <h2 className='section-title'>
+            <span className='section-icon'>📐</span>Simulation Model
+          </h2>
+          <div className='form-group'>
+            <label className='form-label'>Select Model</label>
             <select
-              style={{
-                width: '100%',
-                padding: '15px',
-                borderRadius: '12px',
-                backgroundColor: '#1e293b',
-                border: '1px solid #334155',
-                color: 'white',
-                marginTop: '8px',
-              }}
-              value={form.model}
-              onChange={(e) => setForm({ ...form, model: e.target.value })}
+              className='form-select'
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
             >
-              <option value='M/M/1'>M/M/1</option>
-              <option value='M/G/1'>M/G/1</option>
+              {MODELS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
             </select>
           </div>
-          <div>
-            <label
-              style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold' }}
-            >
-              INTER-ARRIVAL TIME (λ)
+        </div>
+
+        <div className='divider' />
+
+        {/* ── ARRIVAL ── */}
+        <div className='form-section'>
+          <h2 className='section-title'>
+            <span className='section-icon'>📍</span>Arrival Parameters
+          </h2>
+          <div className='form-group'>
+            <label className='form-label'>
+              Arrival Rate λ (customers per minute)
             </label>
             <input
-              style={{
-                width: '100%',
-                padding: '15px',
-                borderRadius: '12px',
-                backgroundColor: '#1e293b',
-                border: '1px solid #334155',
-                color: 'white',
-                marginTop: '8px',
-              }}
+              type='number'
+              min='0.01'
+              step='any'
+              required
+              className='form-input'
               placeholder='e.g. 2.65'
-              value={form.arrival}
-              onChange={(e) => setForm({ ...form, arrival: e.target.value })}
+              value={interArrival}
+              onChange={(e) => setInterArrival(e.target.value)}
             />
           </div>
+        </div>
 
-          {/* M/M/1 Specific Input - Only show when M/M/1 is selected */}
-          {form.model === 'M/M/1' && (
-            <div>
-              <label
-                style={{
-                  fontSize: '12px',
-                  color: '#64748b',
-                  fontWeight: 'bold',
-                }}
-              >
-                SERVICE RATE (μ)
+        <div className='divider' />
+
+        {/* ── SERVICE ── */}
+        <div className='form-section'>
+          <h2 className='section-title'>
+            <span className='section-icon'>🏥</span>Service Parameters
+          </h2>
+
+          {/* Exponential — M/M models */}
+          {!isG && (
+            <div className='form-group'>
+              <label className='form-label'>
+                Service Rate μ (customers per minute)
               </label>
               <input
-                style={{
-                  width: '100%',
-                  padding: '15px',
-                  borderRadius: '12px',
-                  backgroundColor: '#1e293b',
-                  border: '1px solid #334155',
-                  color: 'white',
-                  marginTop: '8px',
-                }}
+                type='number'
+                min='0.01'
+                step='any'
+                required
+                className='form-input'
                 placeholder='e.g. 7.45'
-                value={form.service}
-                onChange={(e) => setForm({ ...form, service: e.target.value })}
+                value={serviceTime}
+                onChange={(e) => setServiceTime(e.target.value)}
               />
-              <div
-                style={{ fontSize: '11px', color: '#64748b', marginTop: '5px' }}
-              >
-                Service rate parameter (μ) for exponential distribution
-              </div>
             </div>
           )}
 
-          {/* M/G/1 Specific Inputs - Only show when M/G/1 is selected */}
-          {form.model === 'M/G/1' && (
+          {/* General — M/G models */}
+          {isG && (
             <>
-              <div>
-                <label
-                  style={{
-                    fontSize: '12px',
-                    color: '#64748b',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  SERVICE TIME DISTRIBUTION
-                </label>
+              <div className='form-group'>
+                <label className='form-label'>Service Distribution</label>
                 <select
-                  style={{
-                    width: '100%',
-                    padding: '15px',
-                    borderRadius: '12px',
-                    backgroundColor: '#1e293b',
-                    border: '1px solid #334155',
-                    color: 'white',
-                    marginTop: '8px',
-                  }}
-                  value={form.distribution}
-                  onChange={(e) =>
-                    setForm({ ...form, distribution: e.target.value })
-                  }
+                  className='form-select'
+                  value={serviceDist}
+                  onChange={(e) => setServiceDist(e.target.value)}
                 >
                   <option value='Uniform'>Uniform</option>
                   <option value='Normal'>Normal</option>
                 </select>
               </div>
 
-              {/* Placeholder cell to keep the 2-column grid aligned */}
-              <div />
+              {serviceDist === 'Uniform' && (
+                <div className='form-row'>
+                  <div className='form-group'>
+                    <label className='form-label'>Minimum a (minutes)</label>
+                    <input
+                      type='number'
+                      min='0'
+                      step='any'
+                      required
+                      className='form-input'
+                      placeholder='e.g. 1'
+                      value={uniMin}
+                      onChange={(e) => setUniMin(e.target.value)}
+                    />
+                  </div>
+                  <div className='form-group'>
+                    <label className='form-label'>Maximum b (minutes)</label>
+                    <input
+                      type='number'
+                      min='0'
+                      step='any'
+                      required
+                      className='form-input'
+                      placeholder='e.g. 10'
+                      value={uniMax}
+                      onChange={(e) => setUniMax(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
 
-              {form.distribution === 'Uniform' ? (
-                <>
-                  <div>
-                    <label
-                      style={{
-                        fontSize: '12px',
-                        color: '#64748b',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      MIN SERVICE TIME (a)
+              {serviceDist === 'Normal' && (
+                <div className='form-row'>
+                  <div className='form-group'>
+                    <label className='form-label'>
+                      Mean Service Time (minutes)
                     </label>
                     <input
-                      style={{
-                        width: '100%',
-                        padding: '15px',
-                        borderRadius: '12px',
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
-                        color: 'white',
-                        marginTop: '8px',
-                      }}
-                      placeholder='e.g. 3.0'
-                      value={form.serviceMin}
-                      onChange={(e) =>
-                        setForm({ ...form, serviceMin: e.target.value })
-                      }
+                      type='number'
+                      min='0.01'
+                      step='any'
+                      required
+                      className='form-input'
+                      placeholder='e.g. 5'
+                      value={normalMean}
+                      onChange={(e) => setNormalMean(e.target.value)}
                     />
-                    <div
-                      style={{
-                        fontSize: '11px',
-                        color: '#64748b',
-                        marginTop: '5px',
-                      }}
-                    >
-                      Minimum service time parameter (a)
-                    </div>
                   </div>
-                  <div>
-                    <label
-                      style={{
-                        fontSize: '12px',
-                        color: '#64748b',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      MAX SERVICE TIME (b)
-                    </label>
+                  <div className='form-group'>
+                    <label className='form-label'>Variance (min²)</label>
                     <input
-                      style={{
-                        width: '100%',
-                        padding: '15px',
-                        borderRadius: '12px',
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
-                        color: 'white',
-                        marginTop: '8px',
-                      }}
-                      placeholder='e.g. 12.0'
-                      value={form.serviceMax}
-                      onChange={(e) =>
-                        setForm({ ...form, serviceMax: e.target.value })
-                      }
+                      type='number'
+                      min='0.01'
+                      step='any'
+                      required
+                      className='form-input'
+                      placeholder='e.g. 2'
+                      value={normalVariance}
+                      onChange={(e) => setNormalVariance(e.target.value)}
                     />
-                    <div
-                      style={{
-                        fontSize: '11px',
-                        color: '#64748b',
-                        marginTop: '5px',
-                      }}
-                    >
-                      Maximum service time parameter (b)
-                    </div>
                   </div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <label
-                      style={{
-                        fontSize: '12px',
-                        color: '#64748b',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      MEAN SERVICE TIME (μ)
-                    </label>
-                    <input
-                      style={{
-                        width: '100%',
-                        padding: '15px',
-                        borderRadius: '12px',
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
-                        color: 'white',
-                        marginTop: '8px',
-                      }}
-                      placeholder='e.g. 8.0'
-                      value={form.serviceMean}
-                      onChange={(e) =>
-                        setForm({ ...form, serviceMean: e.target.value })
-                      }
-                    />
-                    <div
-                      style={{
-                        fontSize: '11px',
-                        color: '#64748b',
-                        marginTop: '5px',
-                      }}
-                    >
-                      Mean service time parameter (μ)
-                    </div>
-                  </div>
-                  <div>
-                    <label
-                      style={{
-                        fontSize: '12px',
-                        color: '#64748b',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      VARIANCE (σ²)
-                    </label>
-                    <input
-                      style={{
-                        width: '100%',
-                        padding: '15px',
-                        borderRadius: '12px',
-                        backgroundColor: '#1e293b',
-                        border: '1px solid #334155',
-                        color: 'white',
-                        marginTop: '8px',
-                      }}
-                      placeholder='e.g. 2.5'
-                      value={form.serviceVariance}
-                      onChange={(e) =>
-                        setForm({ ...form, serviceVariance: e.target.value })
-                      }
-                    />
-                    <div
-                      style={{
-                        fontSize: '11px',
-                        color: '#64748b',
-                        marginTop: '5px',
-                      }}
-                    >
-                      Variance parameter (σ²) — standard deviation is √(σ²)
-                    </div>
-                  </div>
-                </>
+                </div>
               )}
             </>
           )}
         </div>
 
-        <div style={{ marginTop: '1.5rem' }}>
-          <label
-            style={{
-              fontSize: '12px',
-              color: '#64748b',
-              fontWeight: 'bold',
-            }}
-          >
-            NUMBER OF CUSTOMERS
-          </label>
-          <input
-            style={{
-              width: '100%',
-              padding: '15px',
-              borderRadius: '12px',
-              backgroundColor: '#1e293b',
-              border: '1px solid #334155',
-              color: 'white',
-              marginTop: '8px',
-            }}
-            placeholder='e.g. 10'
-            value={form.customers}
-            onChange={(e) => setForm({ ...form, customers: e.target.value })}
-          />
-        </div>
-
+        {/* ── ERROR ── */}
         {error && (
-          <div
-            style={{
-              marginTop: '20px',
-              padding: '15px',
-              backgroundColor: '#7f1d1d',
-              borderRadius: '12px',
-              color: '#fca5a5',
-              border: '1px solid #991b1b',
-            }}
-          >
-            ❌ {error}
+          <div className='sim-inline-error'>
+            <div className='error-alert' style={{ maxWidth: '100%' }}>
+              <div className='error-icon'>⚠️</div>
+              <div className='error-content'>
+                <div className='error-title'>Simulation Error</div>
+                <div className='error-message'>{error}</div>
+              </div>
+            </div>
           </div>
         )}
 
-        <button
-          onClick={runSim}
-          style={{
-            width: '100%',
-            marginTop: '35px',
-            padding: '18px',
-            borderRadius: '15px',
-            backgroundColor: '#0d9488',
-            color: 'white',
-            fontWeight: 'bold',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          ▶ RUN SIMULATION
-        </button>
-
-        {/* Show model-specific formula hint */}
-        <div
-          style={{
-            marginTop: '20px',
-            padding: '15px',
-            backgroundColor: '#1e293b',
-            borderRadius: '12px',
-            fontSize: '13px',
-            color: '#94a3b8',
-          }}
-        >
-          {form.model === 'M/M/1' ? (
-            <div>
-              <strong>Formula:</strong> Service Time = -μ × ln(1 - R), where R
-              is a random number between 0 and 1
-            </div>
-          ) : form.distribution === 'Uniform' ? (
-            <div>
-              <strong>Formula:</strong> Service Time = a + (b-a) × U, where U is
-              a random number between 0 and 1
-            </div>
-          ) : (
-            <div>
-              <strong>Formula:</strong> Service Time = μ + Z × σ, where Z is a
-              standard normal random variable (Box-Muller transform) and σ =
-              √(σ²)
-            </div>
-          )}
+        {/* ── ACTIONS ── */}
+        <div className='form-actions'>
+          <button type='submit' className='btn-submit' disabled={loading}>
+            {loading ? '⏳ Simulating...' : '🧪 Run Simulation'}
+          </button>
+          <button type='button' className='btn-reset' onClick={handleReset}>
+            ↻ Clear Form
+          </button>
         </div>
-      </div>
-
-      {data.length > 0 && (
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          {/* TRACE TABLE SECTION */}
-          <div
-            style={{
-              backgroundColor: '#0b1120',
-              borderRadius: '24px',
-              padding: '35px',
-              border: '1px solid #1e293b',
-              marginBottom: '40px',
-            }}
-          >
-            <h2
-              style={{ color: 'white', fontSize: '22px', marginBottom: '25px' }}
-            >
-              📋 Simulation Trace Table
-            </h2>
-            <div style={{ overflowX: 'auto' }}>
-              <table
-                style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  fontSize: '12px',
-                  color: '#94a3b8',
-                }}
-              >
-                <thead>
-                  <tr
-                    style={{
-                      borderBottom: '2px solid #1e293b',
-                      textAlign: 'left',
-                    }}
-                  >
-                    <th style={{ padding: '15px' }}>S.No</th>
-                    <th style={{ padding: '15px' }}>Cumulative Prob</th>
-                    <th style={{ padding: '15px' }}>Lookup</th>
-                    <th style={{ padding: '15px' }}>Min (K)</th>
-                    <th style={{ padding: '15px', color: 'white' }}>
-                      Inter Arrival
-                    </th>
-                    <th style={{ padding: '15px' }}>Arrival Time</th>
-                    <th style={{ padding: '15px', color: '#a855f7' }}>
-                      Service Time
-                    </th>
-                    <th style={{ padding: '15px' }}>Start Time</th>
-                    <th style={{ padding: '15px' }}>End Time</th>
-                    <th style={{ padding: '15px' }}>Turnaround</th>
-                    <th style={{ padding: '15px', color: '#f43f5e' }}>
-                      Wait Time
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.map((r) => (
-                    <tr
-                      key={r.sNo}
-                      style={{ borderBottom: '1px solid #1e293b' }}
-                    >
-                      <td
-                        style={{
-                          padding: '15px',
-                          color: '#2dd4bf',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {r.sNo}
-                      </td>
-                      <td style={{ padding: '15px' }}>
-                        {r.cumulativeProb.toFixed(5)}
-                      </td>
-                      <td style={{ padding: '15px' }}>
-                        {r.cumProbLookup.toFixed(5)}
-                      </td>
-                      <td style={{ padding: '15px' }}>{r.noOfMinK}</td>
-                      <td
-                        style={{
-                          padding: '15px',
-                          color: 'white',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {r.interArrival}
-                      </td>
-                      <td style={{ padding: '15px' }}>{r.arrivalTime}</td>
-                      <td
-                        style={{
-                          padding: '15px',
-                          color: '#a855f7',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {r.serviceTime}
-                      </td>
-                      <td style={{ padding: '15px' }}>{r.startTime}</td>
-                      <td
-                        style={{
-                          padding: '15px',
-                          fontWeight: 'bold',
-                          color: '#e2e8f0',
-                        }}
-                      >
-                        {r.endTime}
-                      </td>
-                      <td style={{ padding: '15px' }}>{r.turnaround}</td>
-                      <td
-                        style={{
-                          padding: '15px',
-                          color: '#f43f5e',
-                          fontWeight: 'bold',
-                        }}
-                      >
-                        {r.waitTime}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* GANTT CHART SECTION */}
-          <div
-            style={{
-              backgroundColor: '#0b1120',
-              borderRadius: '24px',
-              padding: '35px',
-              border: '1px solid #1e293b',
-              marginBottom: '40px',
-            }}
-          >
-            <h2
-              style={{ color: 'white', fontSize: '22px', marginBottom: '30px' }}
-            >
-              📊 Gantt Chart{' '}
-              <span style={{ fontSize: '14px', color: '#64748b' }}>
-                — total simulation time: {totalSimTime} min
-              </span>
-            </h2>
-            <div
-              style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
-            >
-              {data.map((r, i) => (
-                <div
-                  key={i}
-                  style={{ display: 'flex', alignItems: 'center', gap: '20px' }}
-                >
-                  <span
-                    style={{
-                      width: '40px',
-                      fontSize: '14px',
-                      color: '#94a3b8',
-                      fontWeight: 'bold',
-                    }}
-                  >
-                    C{r.sNo}
-                  </span>
-                  <div
-                    style={{
-                      flex: 1,
-                      height: '24px',
-                      backgroundColor: '#1e293b',
-                      borderRadius: '12px',
-                      position: 'relative',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        height: '100%',
-                        left: `${(r.startTime / totalSimTime) * 100}%`,
-                        width: `${(r.serviceTime / totalSimTime) * 100}%`,
-                        backgroundColor: [
-                          '#2dd4bf',
-                          '#a855f7',
-                          '#6366f1',
-                          '#f59e0b',
-                          '#ec4899',
-                        ][i % 5],
-                        borderRadius: '12px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '10px',
-                        color: 'white',
-                        fontWeight: 'bold',
-                      }}
-                    >
-                      {r.serviceTime}m
-                    </div>
-                  </div>
-                  <span
-                    style={{
-                      width: '40px',
-                      fontSize: '12px',
-                      color: '#64748b',
-                    }}
-                  >
-                    {r.endTime}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* PERFORMANCE MEASURES SECTION */}
-          <div
-            style={{
-              backgroundColor: '#0b1120',
-              borderRadius: '24px',
-              padding: '35px',
-              border: '1px solid #1e293b',
-              marginBottom: '40px',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '15px',
-                marginBottom: '30px',
-              }}
-            >
-              <div
-                style={{
-                  backgroundColor: '#2dd4bf22',
-                  padding: '10px',
-                  borderRadius: '12px',
-                }}
-              >
-                📈
-              </div>
-              <div>
-                <h2 style={{ color: 'white', fontSize: '22px', margin: 0 }}>
-                  Performance Measures
-                </h2>
-                <span style={{ fontSize: '12px', color: '#64748b' }}>
-                  {form.model} Simulation Results
-                </span>
-              </div>
-            </div>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-                gap: '20px',
-              }}
-            >
-              <PerformanceCard
-                title='Avg Interarrival Time'
-                value={`${avgInterarrival} min`}
-                subtext='Average time between consecutive arrivals'
-                color='#6366f1'
-                icon='🔄'
-              />
-              <PerformanceCard
-                title='Avg Service Time'
-                value={`${avgService} min`}
-                subtext='Average time server spends on each customer'
-                color='#a855f7'
-                icon='⏱️'
-              />
-              <PerformanceCard
-                title='Avg Wait Time'
-                value={`${avgWait} min`}
-                subtext='Average time a customer waits in queue'
-                color='#ec4899'
-                icon='⏳'
-              />
-              <PerformanceCard
-                title='Avg Response Time'
-                value={`${avgWait} min`}
-                subtext='Average time from arrival until service begins'
-                color='#f59e0b'
-                icon='🕒'
-              />
-              <PerformanceCard
-                title='Avg Turnaround Time'
-                value={`${avgTurnaround} min`}
-                subtext='Average total time in system (wait + service)'
-                color='#10b981'
-                icon='📉'
-              />
-              <PerformanceCard
-                title='Avg Queue Length (Lq)'
-                value={Lq}
-                subtext='Average number of customers waiting in queue'
-                color='#f43f5e'
-                icon='👥'
-              />
-              <PerformanceCard
-                title='Avg Number in System (L)'
-                value={L}
-                subtext='Average number of customers in the system'
-                color='#3b82f6'
-                icon='🏢'
-              />
-              <PerformanceCard
-                title='Server Utilization (ρ)'
-                value={`${utilization}%`}
-                subtext='Fraction of time the server was busy'
-                color='#8b5cf6'
-                icon='📊'
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      </form>
     </div>
   );
 }
